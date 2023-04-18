@@ -17,9 +17,10 @@ var jump_fall_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_FALL_TIME*JUMP_FALL_TIME)
 
 var dash_velocity = 2000.0
 var dash_dur = 0.2 
+var dash_delay = 1 
 
 @onready var dash = $Dash
-	
+@onready var d_cooldwon = $Dash_Cooldown	
 
 func get_gravity(current_velocity_y: float) -> float:
 	return jump_gravity if current_velocity_y > 0 else jump_fall_gravity
@@ -37,7 +38,7 @@ func get_direction() -> Vector2:
 	)
 	
 func get_dash(): 
-	if Input.is_action_just_pressed("dash"): 
+	if Input.is_action_just_pressed("dash") and d_cooldwon.is_stopped(): 
 		dash.start_dash(dash_dur)	
 		
 	if dash.is_dashing():
@@ -49,8 +50,9 @@ func add_player_dash(direction: int):
 	if get_dash(): 
 		velocity.x = dash_velocity * direction
 		velocity.y = 0
-		
-	return velocity 
+		d_cooldwon.start(dash_delay)
+	
+	return velocity  
 
 func add_player_x_movement(
 	current_velocity: Vector2,
@@ -116,3 +118,4 @@ func _process(delta):
 		_animated_sprite.play()
 	else:
 		_animated_sprite.stop()
+

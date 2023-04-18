@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var timer = $dash_timer	
 
+
 func start_dash(dur): 
 	timer.wait_time = dur 
 	timer.start()
