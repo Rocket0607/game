@@ -15,7 +15,6 @@ var jump_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_TIME*JUMP_TIME)) * -1
 var jump_fall_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_FALL_TIME*JUMP_FALL_TIME)) * -1
 
 
-var dash_direction = Vector2(1,0)
 var dash_velocity = 2000.0
 var dash_dur = 0.2 
 
@@ -37,22 +36,21 @@ func get_direction() -> Vector2:
 		get_jump()
 	)
 	
-func do_dash(): 
-	
-	if Input.is_action_pressed("move_right"):
-		dash_direction = Vector2(1,0)
-	if Input.is_action_pressed("move_left"): 
-		dash_direction = Vector2(-1,0)
-	
+func get_dash(): 
 	if Input.is_action_just_pressed("dash"): 
-		dash.start_dash(dash_dur)
+		dash.start_dash(dash_dur)	
 		
-	if dash.is_dashing(): 
-		velocity.x = dash_velocity * dash_direction.x
-		velocity.y = 0
+	if dash.is_dashing():
+		return true 
 	else: 
-		velocity.x = velocity.x 
+		return false
 		
+func add_player_dash(direction: int): 
+	if get_dash(): 
+		velocity.x = dash_velocity * direction
+		velocity.y = 0
+		
+	return velocity 
 
 func add_player_x_movement(
 	current_velocity: Vector2,
@@ -108,7 +106,7 @@ func _physics_process(delta):
 	velocity = add_player_x_movement(velocity, get_direction().x)
 	velocity = add_player_y_movement(velocity, get_jump(), jump_vel)
 	velocity = add_player_gravity(velocity, get_gravity(velocity.y))
-	do_dash()
+	add_player_dash(get_direction().x)
 	move_and_slide()
 
 @onready var _animated_sprite = $AnimatedSprite2D
