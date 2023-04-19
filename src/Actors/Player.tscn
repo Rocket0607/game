@@ -44,3 +44,6 @@ position = Vector2(0, -48)
 shape = SubResource("RectangleShape2D_xs5ok")
 
 [node name="Dash" parent="." instance=ExtResource("3_x0gjp")]
+
+[node name="Dash_Cooldown" type="Timer" parent="."]
+one_shot = true
