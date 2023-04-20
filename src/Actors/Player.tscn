@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://tcumxq3r8puv"]
+[gd_scene load_steps=8 format=3 uid="uid://tcumxq3r8puv"]
 
 [ext_resource type="Script" path="res://src/Actors/Player.gd" id="1_ds2r7"]
 [ext_resource type="Texture2D" uid="uid://c84lkdbliobem" path="res://Edwin-sheet.png" id="2_27g12"]
+[ext_resource type="PackedScene" uid="uid://drvg530jlvqyf" path="res://src/Actors/dash.tscn" id="3_x0gjp"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nvx02"]
 atlas = ExtResource("2_27g12")
@@ -41,3 +42,8 @@ frame_progress = 0.966899
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -48)
 shape = SubResource("RectangleShape2D_xs5ok")
+
+[node name="Dash" parent="." instance=ExtResource("3_x0gjp")]
+
+[node name="Dash_Cooldown" type="Timer" parent="."]
+one_shot = true
