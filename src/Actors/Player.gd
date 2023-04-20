@@ -9,15 +9,9 @@ const JUMP_FALL_TIME = 0.5
 
 var previous_direction: = Vector2.ZERO
 
-<<<<<<< HEAD
-=======
-
->>>>>>> bc893e565e997f8a5e0479eeaba4f66bce01733a
 var jump_vel: float = (2*JUMP_HEIGHT)/JUMP_TIME
 var jump_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_TIME*JUMP_TIME)) * -1
 var jump_fall_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_FALL_TIME*JUMP_FALL_TIME)) * -1
-
-<<<<<<< HEAD
 var jumped_in_time_timer: Timer
 var time_to_jump_timer: Timer
 var jumped_in_air: bool = false;
@@ -47,16 +41,13 @@ func just_left_floor():
 	else:
 		was_on_floor = is_on_floor()
 		return false
-		
-=======
 
 var dash_velocity = 2000.0
 var dash_dur = 0.2 
 var dash_delay = 1 
 
 @onready var dash = $Dash
-@onready var d_cooldwon = $Dash_Cooldown	
->>>>>>> bc893e565e997f8a5e0479eeaba4f66bce01733a
+@onready var d_cooldwon = $Dash_Cooldown
 
 func get_gravity(current_velocity_y: float) -> float:
 	return jump_gravity if current_velocity_y > 0 else jump_fall_gravity
