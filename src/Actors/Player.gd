@@ -1,28 +1,67 @@
-extends Actor
+extends CharacterBody2D
 
 const MAX_VEL_X: = 550.0
 const ACCEL_X: = 2500
 const DECCEL_X: = 4000
-const JUMP_HEIGHT: = 250
-const JUMP_TIME: = 0.35
-const JUMP_FALL_TIME = 0.3
+const JUMP_HEIGHT: = 300
+const JUMP_TIME: = 0.5
+const JUMP_FALL_TIME = 0.5
 
 var previous_direction: = Vector2.ZERO
 
-func calc_jump_params(max_height: float, time_to_height: float):
-	return [(2*max_height)/time_to_height, ((-2*max_height)/(time_to_height*time_to_height))]
-	
-var jump_params: Array = calc_jump_params(JUMP_HEIGHT, JUMP_TIME)
 var jump_vel: float = (2*JUMP_HEIGHT)/JUMP_TIME
 var jump_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_TIME*JUMP_TIME)) * -1
 var jump_fall_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_FALL_TIME*JUMP_FALL_TIME)) * -1
+
+var jumped_in_time_timer: Timer
+var time_to_jump_timer: Timer
+var jumped_in_air: bool = false;
+var jumped_in_time: bool = false;
+var time_to_jump: bool = false;
+
+var was_on_floor: bool = false;
+
+func _init():
+	jumped_in_time_timer = Timer.new()
+	add_child(jumped_in_time_timer)
+	jumped_in_time_timer.connect("timeout", set_jumped_in_time)
+	time_to_jump_timer = Timer.new()
+	add_child(time_to_jump_timer)
+	time_to_jump_timer.connect("timeout", set_time_to_jump)
+	
+func set_jumped_in_time():
+	jumped_in_time = false
+	
+func set_time_to_jump():
+	time_to_jump = false
+	
+func just_left_floor():
+	if was_on_floor == true and is_on_floor() == false:
+		was_on_floor = is_on_floor()
+		return true
+	else:
+		was_on_floor = is_on_floor()
+		return false
+		
 
 func get_gravity(current_velocity_y: float) -> float:
 	return jump_gravity if current_velocity_y > 0 else jump_fall_gravity
 
 func get_jump() -> bool:
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and (is_on_floor() or time_to_jump):
 		return true
+	elif is_on_floor() and jumped_in_time:
+		return true
+	elif Input.is_action_just_pressed("jump"):
+		jumped_in_time_timer.start(0.1)
+		# MUTATION
+		jumped_in_time = true;
+		return false
+	elif just_left_floor():
+		time_to_jump_timer.start(0.1)
+		# MUTATION
+		time_to_jump = true;
+		return false
 	else:
 		return false
 
