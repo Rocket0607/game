@@ -14,15 +14,13 @@ config/name="testing grounds"
 run/main_scene="res://src/Levels/level_test.tscn"
 config/features=PackedStringArray("4.0", "Forward Plus")
 config/icon="res://icon.svg"
-
-<<<<<<< HEAD
-[display]
-
-window/size/mode=3
+"<<<<<<<HEAD[display]window/size/mode"=3
 window/vsync/vsync_mode=0
 
-=======
->>>>>>> bc893e565e997f8a5e0479eeaba4f66bce01733a
+[display]
+
+window/vsync/vsync_mode=0
+
 [input]
 
 move_left={

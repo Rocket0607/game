@@ -6,33 +6,25 @@ const DECCEL_X: = 4000
 const JUMP_HEIGHT: = 300
 const JUMP_TIME: = 0.5
 const JUMP_FALL_TIME = 0.5
+const DASH_VEL = 2000.0
 
 var previous_direction: = Vector2.ZERO
 
 var jump_vel: float = (2*JUMP_HEIGHT)/JUMP_TIME
 var jump_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_TIME*JUMP_TIME)) * -1
 var jump_fall_gravity: float = ((-2*JUMP_HEIGHT)/(JUMP_FALL_TIME*JUMP_FALL_TIME)) * -1
-var jumped_in_time_timer: Timer
-var time_to_jump_timer: Timer
+var timer_manager: TimerManager;
 var jumped_in_air: bool = false;
-var jumped_in_time: bool = false;
-var time_to_jump: bool = false;
 
 var was_on_floor: bool = false;
 
 func _init():
-	jumped_in_time_timer = Timer.new()
-	add_child(jumped_in_time_timer)
-	jumped_in_time_timer.connect("timeout", set_jumped_in_time)
-	time_to_jump_timer = Timer.new()
-	add_child(time_to_jump_timer)
-	time_to_jump_timer.connect("timeout", set_time_to_jump)
-	
-func set_jumped_in_time():
-	jumped_in_time = false
-	
-func set_time_to_jump():
-	time_to_jump = false
+	timer_manager = TimerManager.new()
+	add_child(timer_manager)
+	timer_manager.create_timer("jump_buffer", 0.1)
+	timer_manager.create_timer("coyote_time", 0.1)
+	timer_manager.create_timer("dash", 0.2)
+	timer_manager.create_timer("dash_cooldown", 1)
 	
 func just_left_floor():
 	if was_on_floor == true and is_on_floor() == false:
@@ -42,30 +34,21 @@ func just_left_floor():
 		was_on_floor = is_on_floor()
 		return false
 
-var dash_velocity = 2000.0
-var dash_dur = 0.2 
-var dash_delay = 1 
 
-@onready var dash = $Dash
-@onready var d_cooldwon = $Dash_Cooldown
 
 func get_gravity(current_velocity_y: float) -> float:
 	return jump_gravity if current_velocity_y > 0 else jump_fall_gravity
 
 func get_jump() -> bool:
-	if Input.is_action_just_pressed("jump") and (is_on_floor() or time_to_jump):
+	if Input.is_action_just_pressed("jump") and (is_on_floor() or timer_manager.is_running("coyote_time")):
 		return true
-	elif is_on_floor() and jumped_in_time:
+	elif is_on_floor() and timer_manager.is_running("jump_buffer"):
 		return true
 	elif Input.is_action_just_pressed("jump"):
-		jumped_in_time_timer.start(0.1)
-		# MUTATION
-		jumped_in_time = true;
+		timer_manager.start_timer("jump_buffer")
 		return false
 	elif just_left_floor():
-		time_to_jump_timer.start(0.1)
-		# MUTATION
-		time_to_jump = true;
+		timer_manager.start_timer("coyote_time")
 		return false
 	else:
 		return false
@@ -77,20 +60,20 @@ func get_direction() -> Vector2:
 	)
 	
 func get_dash(): 
-	if Input.is_action_just_pressed("dash") and d_cooldwon.is_stopped(): 
-		dash.start_dash(dash_dur)	
+	if Input.is_action_just_pressed("dash") and not timer_manager.is_running("dash_cooldown"): 
+		timer_manager.start_timer("dash")
+		timer_manager.start_timer("dash_cooldown")
+		return true
 		
-	if dash.is_dashing():
+	if timer_manager.is_running("dash"):
 		return true 
 	else: 
 		return false
 		
 func add_player_dash(direction: int): 
 	if get_dash(): 
-		velocity.x = dash_velocity * direction
+		velocity.x = DASH_VEL * direction
 		velocity.y = 0
-		d_cooldwon.start(dash_delay)
-	
 	return velocity  
 
 func add_player_x_movement(
